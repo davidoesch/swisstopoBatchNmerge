@@ -41,9 +41,9 @@
     <br />
     <a href="https://github.com/davidoesch/swisstopoBatchNmerge/tree/master/dist"></a>
     ·
-    <a href="https://github.com/othneildrew/Best-README-Template/issues">Report Bug</a>
+    <a href="https://github.com/davidoesch/swisstopoBatchNmergee/issues">Report Bug</a>
     ·
-    <a href="https://github.com/othneildrew/Best-README-Template/issues">Request Feature</a>
+    <a href="https://github.com/davidoesch/swisstopoBatchNmerge/issues">Request Feature</a>
   </p>
 </p>
 
