@@ -192,7 +192,7 @@ Beiträge sind das, was die Open-Source-Gemeinschaft zu einem so grossartigen Or
 
 ## Ausführbare binaries /EXE
 
-Die WINDOWS Version wurde mit pyinstaller realisiert. pyinstaller und gdal - das ist [so ein Sache](https://stackoverflow.com/questions/56472933/pyinstaller-executable-fails foor hooks).
+Die WINDOWS Version wurde mit pyinstaller realisiert. pyinstaller und gdal - das ist [so ein Sache](https://stackoverflow.com/questions/56472933/pyinstaller-executable-fails).
 Lösungsschritte
 
 1. Install pip packages
@@ -248,4 +248,4 @@ Project Link: [https://github.com/davidoesch/swisstopoBatchNmerge](https://githu
 [license-url]: https://github.com/davidoesch/swisstopoBatchNmerge/blob/master/LICENSE.txt
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://linkedin.com/in/davidoesch
-[product-screenshot]: images/screenshot.png
+[product-screenshot]: images/Screenshot.png
