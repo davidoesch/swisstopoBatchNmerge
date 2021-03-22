@@ -244,7 +244,7 @@ Project Link: [https://github.com/davidoesch/swisstopoBatchNmerge](https://githu
 [forks-shield]: https://img.shields.io/github/forks/davidoesch/swisstopoBatchNmerge.svg?style=for-the-badge
 [forks-url]: https://github.com/davidoesch/swisstopoBatchNmerge/network/members
 [stars-shield]: https://img.shields.io/github/stars/davidoesch/swisstopoBatchNmerge.svg?style=for-the-badge
-[stars-url]: https://github.com/davidoesch/swisstopoBatchNmergee/stargazers
+[stars-url]: https://github.com/davidoesch/swisstopoBatchNmerge/stargazers
 [issues-shield]: https://img.shields.io/github/issues/davidoesch/swisstopoBatchNmerge.svg?style=for-the-badge
 [issues-url]: https://github.com/davidoesch/swisstopoBatchNmerge/issues
 [license-shield]: https://img.shields.io/github/license/davidoesch/swisstopoBatchNmerge.svg?style=for-the-badge
