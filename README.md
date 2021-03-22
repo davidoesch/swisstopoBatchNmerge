@@ -77,7 +77,7 @@
 <!-- ABOUT THE PROJECT -->
 ## Das Projekt
 
-[![Product Name Screen Shot][product-screenshot]](https://example.com)
+[![Product Name Screen Shot]
 
 Über die [swisstopo website](https://www.swisstopo.admin.ch/de/geodata.html) können Rohdaten in der höchsten verfügbaren Qualität bezogen werden. Die Daten können räumlich selektiert werden und dann über eine Liste von links (CSV) bezogen werden. Ein einfaches Werkzeug für den Datendownload und das zusammenführen - das soll dieses Projekt bereitstellen.
 
@@ -89,6 +89,9 @@ Hauptfunktionen:
 Voraussetzung: es handelt sich um Rohdatenbezug: der Speicherplatzbedarf kann je nach gewähltem Perimeter und Produkt gross sein. Für Anwendungen bei denen keine hohen Auflösungen benötigt werden, ist mit Vorteil der [PDF Export](https://help.geo.admin.ch/?ids=41&lang=de) von [map.geo.admin.ch](https://map.geo.admin.ch) oder einer der  entsprechenden api.geo.admin.ch Dienste zu nutzen.
 
 Eine Liste häufig verwendeter Ressourcen, die ich hilfreich finde, ist in den acknowledgements aufgeführt.
+
+#### Limitierung (current version)
+- Zusammenführen und ausschneiden nur für Landeskarte , Luftbild/Swissimage und Höhenmodell/Swissalti möglich
 
 <!-- GETTING STARTED -->
 ## Getting Started
