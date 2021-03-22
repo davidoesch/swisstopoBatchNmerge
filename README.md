@@ -131,7 +131,7 @@ Um swisstopoBatchNmerge local zu nutzen, folge diesen einfachen Schritten
 
 <!-- USAGE EXAMPLES -->
 ## Beispiele
-WINDOWS .exe Version,  nutzen bei MAC LINUX jeweils python sswisstopoBatchNmerge.py
+ unten sind WINDOWS /DOS Beispile. Bei MAC LINUX jeweils "python sswisstopoBatchNmerge.py" einsetzen
 
 ### GUI starten
    ```PY
