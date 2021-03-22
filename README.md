@@ -54,7 +54,7 @@
   <summary>Inhalt</summary>
   <ol>
     <li>
-      <a href="#about-the-project">Das Projekt</a>
+      <a href="#das-projekt">Das Projekt</a>
     </li>
     <li>
       <a href="#getting-started">Getting started</a>
@@ -63,7 +63,7 @@
         <li><a href="#installation">(keine) Installation</a></li>
       </ul>
     </li>
-    <li><a href="#usage">Beispiele</a></li>
+    <li><a href="#beispiele">Beispiele</a></li>
     <li><a href="#roadmap">Roadmap</a></li>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
@@ -77,7 +77,7 @@
 <!-- ABOUT THE PROJECT -->
 ## Das Projekt
 
-[![Product Name Screen Shot]
+[![Product Name Screen Shot][product-screenshot]]
 
 Über die [swisstopo website](https://www.swisstopo.admin.ch/de/geodata.html) können Rohdaten in der höchsten verfügbaren Qualität bezogen werden. Die Daten können räumlich selektiert werden und dann über eine Liste von links (CSV) bezogen werden. Ein einfaches Werkzeug für den Datendownload und das zusammenführen - das soll dieses Projekt bereitstellen.
 
