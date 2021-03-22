@@ -150,7 +150,7 @@ Optionen --noMERGE 1 --PROXY http://proxy_url:proxy_port
    ```PY
    swisstopoBatchNmerge.exe --CSV "C:\Downloads\ch.swisstopo.swissimage-dop10-5H5DQOGd.csv" --noGUI 1 
    ```
-### URL PRODUKT und PERIMETER (Vierreck) 
+### PRODUKT und PERIMETER (Vierreck) via URL
 Via SAAC API Aufruf kann ein swisstopo Produkt über einen viereckigen Ausschnitt bezogen werden.
 - Produkte (collection): [Identifier](https://stacindex.org/catalogs/datageoadminch#/?t=collections) zB ch.swisstopo.landeskarte-farbe-10 
 - Perimeter (bbox): Rechteck: Kooridnatenpaar unten link und unten rechts zB  7.43,46.95,7.69,47.10 s
@@ -159,7 +159,7 @@ Optionen --noMERGE 1 --noCROP 1 --PROXY http://proxy_url:proxy_port
    ```PY
    swisstopoBatchNmerge.exe --URL "https://data.geo.admin.ch/api/stac/v0.9/collections/ch.swisstopo.pixelkarte-farbe-pk50.noscale/items?bbox=7.43,46.95,7.69,47.10" --noGUI 1 
    ```
-### PRODUKT und Gemeinde 
+### PRODUKT und GEMEINDE 
 Via StAC API und geo.admin API Aufruf kann ein swisstopo Produkt über einen Gemeinde bezogen werden.
 - LOCATION : Offizieler Gemeindenamen zB "Trimmis" 
 - PRODUCT: (collection): [Identifier](https://stacindex.org/catalogs/datageoadminch#/?t=collections) zB ch.swisstopo.pixelkarte-farbe-pk50.noscale 
