@@ -107,12 +107,15 @@ Um swisstopoBatchNmerge local zu nutzen, folge diesen einfachen Schritten
 
 #### Windows
 
+.EXE -Binaries
 1. Download der zwei Dateien in dasselbe Verzeichnis 
   - [proj.db](https://github.com/davidoesch/swisstopoBatchNmerge/raw/master/dist/proj.db)
   - [swisstopoBatchNmerge.exe](https://github.com/davidoesch/swisstopoBatchNmerge/raw/master/dist/swisstopoBatchNmerge.exe)
 2. Doppelklick auf  swisstopoBatchNmerge.exe
 
-#### MAC / LINUX
+python: siehe 
+
+#### MAC / LINUX / Windows: python
 
 1. Clone the repo
    ```sh
