@@ -105,17 +105,18 @@ Um swisstopoBatchNmerge local zu nutzen, folge diesen einfachen Schritten
 
 ### (Keine) Installation
 
-#### Windows
+#### .EXE / Direkt ausführbar
 
-.EXE -Binaries
+Windows: .EXE -Binaries
 1. Download der zwei Dateien in dasselbe Verzeichnis 
   - [proj.db](https://github.com/davidoesch/swisstopoBatchNmerge/raw/master/dist/proj.db)
   - [swisstopoBatchNmerge.exe](https://github.com/davidoesch/swisstopoBatchNmerge/raw/master/dist/swisstopoBatchNmerge.exe)
 2. Doppelklick auf  swisstopoBatchNmerge.exe
 
-python: siehe 
 
-#### MAC / LINUX / Windows: python
+####  Ptyhon 3.* 
+
+MAC / LINUX / Windows
 
 1. Clone the repo
    ```sh
@@ -134,7 +135,7 @@ python: siehe
 
 <!-- USAGE EXAMPLES -->
 ## Beispiele
- unten sind WINDOWS /DOS Beispile. Bei MAC LINUX jeweils "python sswisstopoBatchNmerge.py" einsetzen
+ unten sind WINDOWS /DOS Beispiele. Bei MAC LINUX jeweils "python sswisstopoBatchNmerge.py" einsetzen
 
 ### GUI starten
    ```PY
