@@ -124,8 +124,10 @@ MAC / LINUX / Windows
    ```
 2. Install pip packages
    ```sh
-   pip install nested_lookup gdal osgeo tkinter pyproj progressbar 
+   python -m pip install -r requirements.txt 
    ```
+   in case you have issues under windows with GDAL: follow this guide to install it https://opensourceoptions.com/blog/how-to-install-gdal-for-python-with-pip-on-windows/ with a wheel file.I was lucky with GDAL-3.4.3-cp310-cp310-win_amd64.whl on Win10
+   
 4. plug&pray `swisstopoBatchNmerge.py`
    ```PY
    python swisstopoBatchNmerge.py
@@ -155,9 +157,9 @@ Optionen --noMERGE 1 --PROXY http://proxy_url:proxy_port
    swisstopoBatchNmerge.exe --CSV "C:\Downloads\ch.swisstopo.swissimage-dop10-5H5DQOGd.csv" --noGUI 1 
    ```
 ### PRODUKT und PERIMETER (Vierreck) via URL
-Via SAAC API Aufruf kann ein swisstopo Produkt über einen viereckigen Ausschnitt bezogen werden.
+Via STAC API Aufruf kann ein swisstopo Produkt über einen viereckigen Ausschnitt bezogen werden.
 - Produkte (collection): [Identifier](https://stacindex.org/catalogs/datageoadminch#/?t=collections) zB ch.swisstopo.landeskarte-farbe-10 
-- Perimeter (bbox): Rechteck: Kooridnatenpaar unten link und unten rechts zB  7.43,46.95,7.69,47.10 s
+- Perimeter (bbox): Rechteck: Koordinatenpaar unten links (Lower left LON LAT) und oben rechts (UR LON LAT) zB  7.43,46.95,7.69,47.10 (mindestens 0.1 deg Seitenlänge Grösse BBOX)
 Optionen --noMERGE 1 --noCROP 1 --PROXY http://proxy_url:proxy_port
 
    ```PY
