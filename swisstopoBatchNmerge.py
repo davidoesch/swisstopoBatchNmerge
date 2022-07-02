@@ -18,7 +18,8 @@
 ###############################################################################
 # to do
 # - add cliping geotiff based on ZIP PLZ Ortschaften using gdal and a shapefile
-# - GUI selection place
+# - GUI selection place: https://github.com/TomSchimansky/TkinterMapView map_with_customtiktinkert, try to collect point with drawing points/rectangel and then get from string minmax of lat lon
+
 # - LIDAR las support
 # - error handling
 # - Naming Convention: function and Var needs to be consistent
@@ -26,6 +27,7 @@
 
 import csv, sys
 from sys import exit
+import tkinter
 import requests,json
 import json
 from nested_lookup import nested_lookup
@@ -36,10 +38,17 @@ import argparse
 import gdal_merge as gm
 from tkinter import *
 from tkinter import filedialog
+import tkintermapview
 from osgeo import gdal
 from pyproj import Transformer
 import  progressbar
 import shutil 
+import math
+from typing import Union
+import numpy as np
+import customtkinter
+from tkintermapview import TkinterMapView
+
 
 #os.environ['PROJ_LIB'] = 'C:\Program Files\Python39\Lib\site-packages\osgeo\data\proj'
 #runtime_hooks=['hook.py']
@@ -53,6 +62,10 @@ supportedformats = ['.tif', '.png', '.tiff', '.TIFF']
 # suuported products
 # TODO: hardcoded. You need to adapt the code for every dataset that is added. Add command to scan it and store
 # in a cache locally
+
+customtkinter.set_appearance_mode("dark")  # Modes: "System" (standard), "Dark", "Light"
+customtkinter.set_default_color_theme("blue")  # Themes: "blue" (standard), "green", "dark-blue"
+
 choices = {
     'SWISSIMAGE 10cm': 'ch.swisstopo.swissimage-dop10',
     'Landeskarte 1:10': 'ch.swisstopo.landeskarte-farbe-10',
@@ -63,11 +76,23 @@ choices = {
     'swissALTI3D': 'ch.swisstopo.swissalti3d',
 }
 
+choices_data = choices.items()
+choices_list = list(choices_data)
+choices_arr = np.array(choices_list)
+
+def osm_to_decimal(tile_x: Union[int, float], tile_y: Union[int, float], zoom: int) -> tuple:
+    """ converts internal OSM coordinates to decimal coordinates """
+
+    n = 2.0 ** zoom
+    lon_deg = tile_x / n * 360.0 - 180.0
+    lat_rad = math.atan(math.sinh(math.pi * (1 - 2 * tile_y / n)))
+    lat_deg = math.degrees(lat_rad)
+    return lat_deg, lon_deg
+
 #StandarVars
 homedir = os.getcwd() 
 pbar = None
 nonImageLayers='swissalti'
-
 
 # Function for opening the 
 # file explorer window
@@ -304,23 +329,144 @@ if args.PROXY is not None :
  os.environ['HTTP_PROXY'] = args.PROXY
  
 if args.noGUI == 0 :
-    # Create the root window
-    window = Tk()
-    # Set window title
-    window.title('SwisstopoBatchNmerge')
-    label_file_explorer = Label(window, 
-        text = "PREPARING ... ")
-    Label(text = " ").grid(column=0)
-    Label(text = " Download und Zusammensetzen ").grid(column=0)
-    Label(text = " ").grid(column=0)
-    Button(text = "Auswahl swisstopo CSV & START",command = browseFiles).grid(column=0)
-    Label(text = " ").grid(column=0)
-    Button(text = "EXIT",command = exit).grid(column=0)
-    Label(text = " ").grid(column=0)
-    label_file_explorer.grid(column = 0)
-    
-    window.mainloop()
+    class App(customtkinter.CTk):
 
+        APP_NAME = "TkinterMapView with CustomTkinter example"
+        WIDTH = 800
+        HEIGHT = 500
+
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+
+            self.title(App.APP_NAME)
+            self.geometry(str(App.WIDTH) + "x" + str(App.HEIGHT))
+            self.minsize(App.WIDTH, App.HEIGHT)
+
+            self.protocol("WM_DELETE_WINDOW", self.on_closing)
+            self.bind("<Command-q>", self.on_closing)
+            self.bind("<Command-w>", self.on_closing)
+            self.createcommand('tk::mac::Quit', self.on_closing)
+
+            self.marker_list = []
+
+
+            # ============ create two CTkFrames ============
+
+            self.grid_columnconfigure(0, weight=0)
+            self.grid_columnconfigure(1, weight=1)
+            self.grid_rowconfigure(0, weight=1)
+
+            self.frame_left = customtkinter.CTkFrame(master=self, width=150, corner_radius=0)
+            self.frame_left.grid(row=0, column=0, padx=0, pady=0, sticky="nsew")
+
+            self.frame_right = customtkinter.CTkFrame(master=self, corner_radius=0, fg_color=self.fg_color)
+            self.frame_right.grid(row=0, column=1, rowspan=1, pady=0, padx=0, sticky="nsew")
+
+            # ============ frame_left ============
+            
+            
+                
+            
+            self.optionmenu_1 =  customtkinter.CTkOptionMenu(master=self.frame_left,
+                                                    values=[row[0] for row in choices_arr],
+                                                    width=120, height=30,
+                                                    corner_radius=8)
+            self.optionmenu_1.grid(pady=(20, 0), padx=(20, 20), row=2, column=0)
+            self.optionmenu_1.set("Auswahl Datensatz")
+            
+
+
+            # ============ frame_right ============
+
+            self.frame_right.grid_rowconfigure(0, weight=0)
+            self.frame_right.grid_rowconfigure(1, weight=1)
+            self.frame_right.grid_rowconfigure(2, weight=0)
+            self.frame_right.grid_columnconfigure(0, weight=1)
+            self.frame_right.grid_columnconfigure(1, weight=0)
+            self.frame_right.grid_columnconfigure(2, weight=1)
+
+
+
+            self.map_widget = TkinterMapView(self.frame_right, corner_radius=11)
+            self.map_widget.grid(row=1, rowspan=1, column=0, columnspan=3, sticky="nswe", padx=(20, 20), pady=(5, 0))
+            
+            self.map_widget.set_tile_server("https://wmts.geo.admin.ch/1.0.0/ch.swisstopo.pixelkarte-farbe/default/current/3857/{z}/{x}/{y}.jpeg")  # no labels
+
+            # set current widget position and zoom
+            self.map_widget.set_position(46.85841, 8.22548)  # center CH
+            self.map_widget.set_zoom(8)
+
+
+            self.entry = customtkinter.CTkEntry(master=self.frame_right,
+                                                placeholder_text="Ort eingeben",
+                                                width=140,
+                                                height=30,
+                                                corner_radius=8)
+            self.entry.grid(row=0, column=0, sticky="we", padx=(20, 0), pady=20)
+            self.entry.entry.bind("<Return>", self.search_event)
+
+            self.button_5 = customtkinter.CTkButton(master=self.frame_right,
+                                                    height=30,
+                                                    text="Search",
+                                                    command=self.search_event,
+                                                    border_width=0,
+                                                    corner_radius=8)
+            self.button_5.grid(row=0, column=1, sticky="w", padx=(20, 0), pady=20)
+
+            self.slider_1 = customtkinter.CTkSlider(master=self.frame_right,
+                                                    width=200,
+                                                    height=16,
+                                                    from_=0, to=19,
+                                                    border_width=5,
+                                                    command=self.slider_event)
+            self.slider_1.grid(row=0, column=2, sticky="e", padx=20, pady=20)
+            self.slider_1.set(self.map_widget.zoom)
+            
+            self.button_2 = customtkinter.CTkButton(master=self.frame_right,
+                                                    text="START Download",
+                                                    command=self.start_download_event,
+                                                    width=120, height=30,
+                                                    border_width=0,
+                                                    corner_radius=8)
+            self.button_2.grid(row=2, column=2, sticky="e", padx=20, pady=20)
+
+    
+
+        def search_event(self, event=None):
+            self.map_widget.set_address(self.entry.get())
+            self.slider_1.set(self.map_widget.zoom)
+
+        def slider_event(self, value):
+            self.map_widget.set_zoom(value)
+                
+        
+        def start_download_event(self):
+            
+            LR=osm_to_decimal(self.map_widget.lower_right_tile_pos[0],self.map_widget.lower_right_tile_pos[1],self.map_widget.last_zoom)
+            UL=osm_to_decimal(self.map_widget.upper_left_tile_pos[0],self.map_widget.upper_left_tile_pos[1],self.map_widget.last_zoom)
+            
+            if self.optionmenu_1.current_value == 'Auswahl Datensatz':
+                print("***********")
+                print("Produkt auswählen!")
+            else:
+                product= choices[self.optionmenu_1.current_value]
+            
+                CSV_filepath=createCSV(product,str(UL[1]),str(LR[0]),str(LR[1]),str(UL[0]))
+                bbox= (UL[1],LR[0],LR[1],UL[0])
+                processCSV(CSV_filepath,bbox)
+                
+        
+
+        def on_closing(self, event=0):
+            self.destroy()
+
+        def start(self):
+            self.mainloop()
+
+
+    if __name__ == "__main__":
+        app = App()
+        app.start()
 # the below should be in an else statement, because otherwise
 # combination of parameters have behaviour that is hard to
 # understand (call with --noGUI=0 and --CSV=1 will start GUI and
