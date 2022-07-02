@@ -159,7 +159,7 @@ Optionen --noMERGE 1 --PROXY http://proxy_url:proxy_port
 ### PRODUKT und PERIMETER (Vierreck) via URL
 Via STAC API Aufruf kann ein swisstopo Produkt über einen viereckigen Ausschnitt bezogen werden.
 - Produkte (collection): [Identifier](https://stacindex.org/catalogs/datageoadminch#/?t=collections) zB ch.swisstopo.landeskarte-farbe-10 
-- Perimeter (bbox): Rechteck: Koordinatenpaar unten links (Lower left LON LAT) und oben rechts (UR LON LAT) zB  7.43,46.95,7.69,47.10 (mindestens 0.1 deg Seitenlänge Grösse BBOX)
+- Perimeter (bbox): Rechteck: Koordinatenpaar unten links (Lower left LON LAT) und oben rechts (UR LON LAT) zB  7.43,46.95,7.69,47.10 
 Optionen --noMERGE 1 --noCROP 1 --PROXY http://proxy_url:proxy_port
 
    ```PY
