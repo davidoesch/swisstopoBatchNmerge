@@ -79,7 +79,9 @@
 
 [![Product Name Screen Shot][product-screenshot]]
 
-Über die [swisstopo website](https://www.swisstopo.admin.ch/de/geodata.html) können Rohdaten in der höchsten verfügbaren Qualität bezogen werden. Die Daten können räumlich selektiert werden und dann über eine Liste von links (CSV) bezogen werden. Ein einfaches Werkzeug für den Datendownload und das zusammenführen - das soll dieses Projekt bereitstellen.
+Ein einfaches graphisches Werkzeug um die aktuellsten swisstopo Karten und Höhenmodell und Luftbilder für ein Gebiet (die Grösse des Fenster durch ziehen anpassen) als ein File richtig zugeschnitten zu beziehen - ist umgesetzt.
+
+Des weiteren können die über [swisstopo website](https://www.swisstopo.admin.ch/de/geodata.html) Werkzeuge erstellten  Listen von DownloadLinks (CSV) via Kommando Zeile einfache bezogen zusammengeführt und zurechtgeschnitten werden.
 
 Hauptfunktionen:
 * Herunterladen und zusammenführen in einem Schritt. Der "fehlende letzte Schritt "  für das CSV von swisstopo
@@ -108,9 +110,8 @@ Um swisstopoBatchNmerge local zu nutzen, folge diesen einfachen Schritten
 #### .EXE / Direkt ausführbar
 
 Windows: .EXE -Binaries
-1. Download der zwei Dateien in dasselbe Verzeichnis 
-  - [proj.db](https://github.com/davidoesch/swisstopoBatchNmerge/raw/master/dist/proj.db)
-  - [swisstopoBatchNmerge.exe](https://github.com/davidoesch/swisstopoBatchNmerge/raw/master/dist/swisstopoBatchNmerge.exe)
+1. Download der Datei: 
+    - [swisstopoBatchNmerge.exe](https://github.com/davidoesch/swisstopoBatchNmerge/raw/master/dist/swisstopoBatchNmerge.exe)
 2. Doppelklick auf  swisstopoBatchNmerge.exe
 
 
@@ -126,7 +127,9 @@ MAC / LINUX / Windows
    ```sh
    python -m pip install -r requirements.txt 
    ```
-   in case you have issues under windows with GDAL: follow this guide to install it https://opensourceoptions.com/blog/how-to-install-gdal-for-python-with-pip-on-windows/ with a wheel file.I was lucky with GDAL-3.4.3-cp310-cp310-win_amd64.whl on Win10
+   GDAL
+   Windows: GDAL: follow this guide  https://opensourceoptions.com/blog/how-to-install-gdal-for-python-with-pip-on-windows/ folegndes wheel file hat unter WIN10 funktioniert GDAL-3.4.3-cp310-cp310-win_amd64.whl on Win10
+   LINUX: https://pypi.org/project/GDAL/
    
 4. plug&pray `swisstopoBatchNmerge.py`
    ```PY
@@ -208,11 +211,11 @@ Lösungsschritte
    ```sh
    pip install pyinstaller 
    ```
-2. Nutze den hook.py 
+2. pyinstaller ausführen
    ```sh
-   pyinstaller swisstopoBatchNmerge.py --onefile --runtime-hook=hook.py 
+   pyinstaller --noconfirm --onefile --console --add-data "<PythonPfad>/Lib/site-packages/osgeo;osgeo/" --add-data "<PythonPfad>/Lib/site-packages/customtkinter;customtkinter/"  "swisstopoBatchNmerge.py" 
    ```
-3. Stelle sicher, dass im dist Verzeichnis das proj.db file vorhanden ist
+
 
 <!-- LICENSE -->
 ## License

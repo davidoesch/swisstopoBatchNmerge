@@ -38,7 +38,6 @@ import argparse
 import gdal_merge as gm
 from tkinter import *
 from tkinter import filedialog
-import tkintermapview
 from osgeo import gdal
 from pyproj import Transformer
 import  progressbar
@@ -48,6 +47,9 @@ from typing import Union
 import numpy as np
 import customtkinter
 from tkintermapview import TkinterMapView
+import sys
+from tkinter import Tk, Button, Frame
+from tkinter.scrolledtext import ScrolledText
 
 
 #os.environ['PROJ_LIB'] = 'C:\Program Files\Python39\Lib\site-packages\osgeo\data\proj'
@@ -63,6 +65,11 @@ supportedformats = ['.tif', '.png', '.tiff', '.TIFF']
 # TODO: hardcoded. You need to adapt the code for every dataset that is added. Add command to scan it and store
 # in a cache locally
 
+#StandarVars
+homedir = os.getcwd() 
+pbar = None
+nonImageLayers='swissalti'
+
 customtkinter.set_appearance_mode("dark")  # Modes: "System" (standard), "Dark", "Light"
 customtkinter.set_default_color_theme("blue")  # Themes: "blue" (standard), "green", "dark-blue"
 
@@ -76,9 +83,12 @@ choices = {
     'swissALTI3D': 'ch.swisstopo.swissalti3d',
 }
 
+
 choices_data = choices.items()
 choices_list = list(choices_data)
 choices_arr = np.array(choices_list)
+
+
 
 def osm_to_decimal(tile_x: Union[int, float], tile_y: Union[int, float], zoom: int) -> tuple:
     """ converts internal OSM coordinates to decimal coordinates """
@@ -89,10 +99,7 @@ def osm_to_decimal(tile_x: Union[int, float], tile_y: Union[int, float], zoom: i
     lat_deg = math.degrees(lat_rad)
     return lat_deg, lon_deg
 
-#StandarVars
-homedir = os.getcwd() 
-pbar = None
-nonImageLayers='swissalti'
+
 
 # Function for opening the 
 # file explorer window
@@ -121,7 +128,11 @@ def createCSV(productname,LLlon,LLlat,URlon,URlat) :
     itemsresult = json.loads(itemsrequest.content)
     assets=(nested_lookup('assets', itemsresult)) #go throug nested results
     itemsfiles=(nested_lookup('href', assets))
+
     
+    
+
+
     #edge case _krel_ : swisstopo provides also grey an relief free raster maps ,we go only for krel
     # TODO: make special cases generic (outsource to dedicated function that is genereic for similar special cases)
     # in this case something like 'filter_if_contains(list, term)'. There might be even a ready-made python lib/function
@@ -136,6 +147,39 @@ def createCSV(productname,LLlon,LLlat,URlon,URlat) :
     if len(highres) != 0 :
         itemsfiles=highres
         
+    #edge case creation date get the most recent one
+    
+    #split the name of the file to get the dates etc
+    itemdate=[]
+    itemblatt=[]
+    itemend=[]
+    itemname=[]
+    for i in itemsfiles:     
+        x=(os.path.basename(i))
+        x=x.split("_",3)
+        itemblatt.append(x[2])
+        itemdate.append(x[1])
+        itemend.append(x[3])
+        itemname.append(x[0])
+
+    #sort the list by date
+    latest_itemsfiles=[]
+    i=0
+    while i < len(itemblatt):
+
+        #find index of duplicates in itemblatt
+        y=itemblatt[i]
+        indices = [idx for idx, s in enumerate(itemblatt) if y in s]
+        #datelist
+        datelist=[]
+        for idx in indices:
+            datelist.append(itemdate[idx])
+        datemax=max(datelist)
+        latest_itemsfiles.append("https://data.geo.admin.ch"+"/"+productname+"/"+itemname[i]+"_"+datemax+"_"+itemblatt[i]+"/"+itemname[i]+"_"+datemax+"_"+itemblatt[i]+"_"+itemend[i])
+        i=i+1
+    #remove duplicates
+    itemsfiles= list(dict.fromkeys(latest_itemsfiles))
+    
     #create temporaryCSV file
     with open(CSV_filepath, 'w') as f:
         for item in itemsfiles:
@@ -182,7 +226,7 @@ def check_local_system(gettempdir,filename,lines) :
         exit()
         return
     else :
-        low_space_message=(str(round(requiredspaceGB,3))+"GB of "+(str(round(free_space_gb,3))+" GB remaining")) 
+        low_space_message=(str(round(requiredspaceGB,3))+"GB will be downloaded. Free space available: "+(str(round(free_space_gb,3))+" GB")) 
 
     
     return(low_space_message) 
@@ -251,7 +295,7 @@ def processCSV(CSV_filepath,geom):
     file = open(os.path.normpath(CSV_filepath))
     reader = csv.reader(file)
     lines= len(list(reader))
-    
+   
     # For every line in the file do
     for iteration, url in enumerate(open(os.path.normpath(CSV_filepath))):
         # Split on the rightmost / and take everything on the right side of that
@@ -314,6 +358,7 @@ def processCSV(CSV_filepath,geom):
 #main partition
 #checking arguments
 # doc missing
+
 parser = argparse.ArgumentParser(description='--h for all options , eg PROXY http://proxy_url:proxy_port')
 parser.add_argument("--CSV")
 parser.add_argument("--URL")
@@ -325,13 +370,17 @@ parser.add_argument("--noMERGE", type=int, default=0)
 parser.add_argument("--PROXY")
 args = parser.parse_args()
 
+#remove only test below
+#args.URL="https://data.geo.admin.ch/api/stac/v0.9/collections/ch.swisstopo.landeskarte-farbe-10/items?bbox=7.43,46.95,7.69,47.10"
+#args.noGUI=1
+
 if args.PROXY is not None : 
  os.environ['HTTP_PROXY'] = args.PROXY
  
 if args.noGUI == 0 :
     class App(customtkinter.CTk):
 
-        APP_NAME = "TkinterMapView with CustomTkinter example"
+        APP_NAME = "swisstopoDatendownloader"
         WIDTH = 800
         HEIGHT = 500
 
@@ -363,10 +412,7 @@ if args.noGUI == 0 :
             self.frame_right.grid(row=0, column=1, rowspan=1, pady=0, padx=0, sticky="nsew")
 
             # ============ frame_left ============
-            
-            
-                
-            
+            #pulldown menu
             self.optionmenu_1 =  customtkinter.CTkOptionMenu(master=self.frame_left,
                                                     values=[row[0] for row in choices_arr],
                                                     width=120, height=30,
@@ -374,7 +420,6 @@ if args.noGUI == 0 :
             self.optionmenu_1.grid(pady=(20, 0), padx=(20, 20), row=2, column=0)
             self.optionmenu_1.set("Auswahl Datensatz")
             
-
 
             # ============ frame_right ============
 
@@ -386,17 +431,16 @@ if args.noGUI == 0 :
             self.frame_right.grid_columnconfigure(2, weight=1)
 
 
-
+            #map widget
             self.map_widget = TkinterMapView(self.frame_right, corner_radius=11)
             self.map_widget.grid(row=1, rowspan=1, column=0, columnspan=3, sticky="nswe", padx=(20, 20), pady=(5, 0))
-            
             self.map_widget.set_tile_server("https://wmts.geo.admin.ch/1.0.0/ch.swisstopo.pixelkarte-farbe/default/current/3857/{z}/{x}/{y}.jpeg")  # no labels
 
-            # set current widget position and zoom
+            # set current map widget position and zoom
             self.map_widget.set_position(46.85841, 8.22548)  # center CH
             self.map_widget.set_zoom(8)
 
-
+            # search
             self.entry = customtkinter.CTkEntry(master=self.frame_right,
                                                 placeholder_text="Ort eingeben",
                                                 width=140,
@@ -412,7 +456,7 @@ if args.noGUI == 0 :
                                                     border_width=0,
                                                     corner_radius=8)
             self.button_5.grid(row=0, column=1, sticky="w", padx=(20, 0), pady=20)
-
+            #zoom
             self.slider_1 = customtkinter.CTkSlider(master=self.frame_right,
                                                     width=200,
                                                     height=16,
@@ -422,15 +466,22 @@ if args.noGUI == 0 :
             self.slider_1.grid(row=0, column=2, sticky="e", padx=20, pady=20)
             self.slider_1.set(self.map_widget.zoom)
             
+            #start download
             self.button_2 = customtkinter.CTkButton(master=self.frame_right,
                                                     text="START Download",
+                                                    fg_color= "red",
                                                     command=self.start_download_event,
                                                     width=120, height=30,
                                                     border_width=0,
                                                     corner_radius=8)
             self.button_2.grid(row=2, column=2, sticky="e", padx=20, pady=20)
 
-    
+            #self.log_widget = ScrolledText(self.frame_right, height=4,width=120,  font=("consolas", "8", "normal"))
+            #self.log_widget.grid(row=2, columnspan=2, sticky="e", padx=20, pady=20)
+            #logger = PrintLogger(self.log_widget)
+            #sys.stdout = logger
+            #sys.stderr = logger
+            print("Produkt und Perimeter auswählen...")
 
         def search_event(self, event=None):
             self.map_widget.set_address(self.entry.get())
@@ -441,12 +492,12 @@ if args.noGUI == 0 :
                 
         
         def start_download_event(self):
-            
+            print("Starting download...")
             LR=osm_to_decimal(self.map_widget.lower_right_tile_pos[0],self.map_widget.lower_right_tile_pos[1],self.map_widget.last_zoom)
             UL=osm_to_decimal(self.map_widget.upper_left_tile_pos[0],self.map_widget.upper_left_tile_pos[1],self.map_widget.last_zoom)
             
             if self.optionmenu_1.current_value == 'Auswahl Datensatz':
-                print("***********")
+                print("******************")
                 print("Produkt auswählen!")
             else:
                 product= choices[self.optionmenu_1.current_value]
@@ -467,6 +518,7 @@ if args.noGUI == 0 :
     if __name__ == "__main__":
         app = App()
         app.start()
+
 # the below should be in an else statement, because otherwise
 # combination of parameters have behaviour that is hard to
 # understand (call with --noGUI=0 and --CSV=1 will start GUI and
