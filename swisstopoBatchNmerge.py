@@ -24,32 +24,26 @@
 # - error handling
 # - Naming Convention: function and Var needs to be consistent
 
-
-import csv, sys
-from sys import exit
-import tkinter
-import requests,json
+import argparse
+import csv
+import customtkinter
+import gdal_merge as gm
 import json
-from nested_lookup import nested_lookup
+import math
+import nested_lookup
+import numpy as np
+import os
+import progressbar
+import requests
+import shutil 
+import sys
+import tkinter
+import tkintermapview
 # TODO: requests already imported above. Use that instead of loading another url/request library
 import urllib.request
-import os
-import argparse
-import gdal_merge as gm
-from tkinter import *
-from tkinter import filedialog
 from osgeo import gdal
 from pyproj import Transformer
-import  progressbar
-import shutil 
-import math
 from typing import Union
-import numpy as np
-import customtkinter
-from tkintermapview import TkinterMapView
-import sys
-from tkinter import Tk, Button, Frame
-from tkinter.scrolledtext import ScrolledText
 
 
 #os.environ['PROJ_LIB'] = 'C:\Program Files\Python39\Lib\site-packages\osgeo\data\proj'
@@ -105,7 +99,7 @@ def osm_to_decimal(tile_x: Union[int, float], tile_y: Union[int, float], zoom: i
 # file explorer window
 def browseFiles():
     # In variabel names, be as specific as possible (what it is)
-    CSV_filepath = filedialog.askopenfilename(initialdir = "/",title = "Select a File",filetypes = (("Text files","*.csv*"),("all files","*.*")))
+    CSV_filepath = tkinter.filedialog.askopenfilename(initialdir = "/",title = "Select a File",filetypes = (("Text files","*.csv*"),("all files","*.*")))
     # Change label contents
     label_file_explorer.configure(text="PROCESSING: "+CSV_filepath+" ...")
     # No need to create a variable, set some magic string to it and pass it to a function
@@ -126,8 +120,8 @@ def createCSV(productname,LLlon,LLlat,URlon,URlat) :
     #gettingitemlist
     itemsrequest = requests.get("https://data.geo.admin.ch/api/stac/v0.9/collections/"+productname+"/items?bbox="+LLlon+","+LLlat+","+URlon+","+URlat) #cal on STAC API
     itemsresult = json.loads(itemsrequest.content)
-    assets=(nested_lookup('assets', itemsresult)) #go throug nested results
-    itemsfiles=(nested_lookup('href', assets))
+    assets=(nested_lookup.nested_lookup('assets', itemsresult)) #go throug nested results
+    itemsfiles=(nested_lookup.nested_lookup('href', assets))
 
     
     
@@ -223,7 +217,7 @@ def check_local_system(gettempdir,filename,lines) :
         print("!!!!!!!!!!!!!!!!!!!!!   WARNING  !!!!!!!!!!!!!!!!!!!!")
         print(low_space_message)
         # what is breakpoint()?
-        exit()
+        sys.exit()
         return
     else :
         low_space_message=(str(round(requiredspaceGB,3))+"GB will be downloaded. Free space available: "+(str(round(free_space_gb,3))+" GB")) 
@@ -432,7 +426,7 @@ if args.noGUI == 0 :
 
 
             #map widget
-            self.map_widget = TkinterMapView(self.frame_right, corner_radius=11)
+            self.map_widget = tkintermapview.TkinterMapView(self.frame_right, corner_radius=11)
             self.map_widget.grid(row=1, rowspan=1, column=0, columnspan=3, sticky="nswe", padx=(20, 20), pady=(5, 0))
             self.map_widget.set_tile_server("https://wmts.geo.admin.ch/1.0.0/ch.swisstopo.pixelkarte-farbe/default/current/3857/{z}/{x}/{y}.jpeg")  # no labels
 
@@ -476,7 +470,7 @@ if args.noGUI == 0 :
                                                     corner_radius=8)
             self.button_2.grid(row=2, column=2, sticky="e", padx=20, pady=20)
 
-            #self.log_widget = ScrolledText(self.frame_right, height=4,width=120,  font=("consolas", "8", "normal"))
+            #self.log_widget = tkinter.scrolledtext.ScrolledText(self.frame_right, height=4,width=120,  font=("consolas", "8", "normal"))
             #self.log_widget.grid(row=2, columnspan=2, sticky="e", padx=20, pady=20)
             #logger = PrintLogger(self.log_widget)
             #sys.stdout = logger
