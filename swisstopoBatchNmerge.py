@@ -60,6 +60,7 @@ supportedformats = ['.tif', '.png', '.tiff', '.TIFF']
 # in a cache locally
 
 #StandarVars
+GUI_Version="Version 1.0.1"
 homedir = os.getcwd() 
 pbar = None
 nonImageLayers='swissalti'
@@ -374,7 +375,7 @@ if args.PROXY is not None :
 if args.noGUI == 0 :
     class App(customtkinter.CTk):
 
-        APP_NAME = "swisstopoDatendownloader"
+        APP_NAME = "swisstopoDatenDownloader "+str(GUI_Version)
         WIDTH = 800
         HEIGHT = 500
 
@@ -410,6 +411,7 @@ if args.noGUI == 0 :
             self.optionmenu_1 =  customtkinter.CTkOptionMenu(master=self.frame_left,
                                                     values=[row[0] for row in choices_arr],
                                                     width=120, height=30,
+                                                    command=self.loadmapproduct_event,
                                                     corner_radius=8)
             self.optionmenu_1.grid(pady=(20, 0), padx=(20, 20), row=2, column=0)
             self.optionmenu_1.set("Auswahl Datensatz")
@@ -483,8 +485,27 @@ if args.noGUI == 0 :
 
         def slider_event(self, value):
             self.map_widget.set_zoom(value)
-                
+
         
+        def loadmapproduct_event(self, event=None):
+            LR=osm_to_decimal(self.map_widget.lower_right_tile_pos[0],self.map_widget.lower_right_tile_pos[1],self.map_widget.last_zoom)
+            UL=osm_to_decimal(self.map_widget.upper_left_tile_pos[0],self.map_widget.upper_left_tile_pos[1],self.map_widget.last_zoom)
+            z=self.map_widget.last_zoom
+            self.map_widget.tile_image_cache={}
+            if choices[self.optionmenu_1.current_value] =="ch.swisstopo.swissalti3d":
+                WMTS_name="ch.swisstopo.swissalti3d-reliefschattierung"
+            elif choices[self.optionmenu_1.current_value] =="ch.swisstopo.swissimage-dop10":
+                WMTS_name="ch.swisstopo.swissimage-product"
+            else:
+                WMTS_name=choices[self.optionmenu_1.current_value]
+            #breakpoint()
+            self.map_widget = tkintermapview.TkinterMapView(self.frame_right, corner_radius=11)
+            self.map_widget.grid(row=1, rowspan=1, column=0, columnspan=3, sticky="nswe", padx=(20, 20), pady=(5, 0))
+            self.map_widget.set_tile_server("https://wmts.geo.admin.ch/1.0.0/"+WMTS_name+"/default/current/3857/{z}/{x}/{y}.jpeg")  # no labels        
+            # set current map widget position and zoom
+            self.map_widget.set_position((LR[0]+UL[0])/2, (LR[1]+UL[1])/2)  # center current poistions
+            self.map_widget.set_zoom(z)
+
         def start_download_event(self):
             print("Starting download...")
             LR=osm_to_decimal(self.map_widget.lower_right_tile_pos[0],self.map_widget.lower_right_tile_pos[1],self.map_widget.last_zoom)
