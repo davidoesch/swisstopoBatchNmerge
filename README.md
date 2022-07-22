@@ -274,4 +274,4 @@ Project Link: [https://github.com/davidoesch/swisstopoBatchNmerge](https://githu
 [license-url]: https://github.com/davidoesch/swisstopoBatchNmerge/blob/master/LICENSE.md
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://linkedin.com/in/davidoesch
-[product-screenshot]: images/Screenshot.png
+[product-screenshot]: images/Animation1.gif
