@@ -218,18 +218,14 @@ Lösungsschritte
 3. Die Datei (`swisstopoBatchNmerge.spec`) for der Zeile (`pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher`) mit ergänzen
    ```sh
    from PyInstaller.building.datastruct import TOC
+   x = 'cp310-win_amd64.pyd'
+   datas_upd = TOC()
 
-# ...
-# a = Analysis(...)
+   for d in a.datas:
+      if x not in d[0] and x not in d[1]:
+          datas_upd.append(d)
 
-x = 'cp310-win_amd64.pyd'
-datas_upd = TOC()
-
-for d in a.datas:
-    if x not in d[0] and x not in d[1]:
-        datas_upd.append(d)
-
-a.datas = datas_upd 
+   a.datas = datas_upd
    ```
 4. pyinstaller zum zweiten mal ausführen
    ```sh
