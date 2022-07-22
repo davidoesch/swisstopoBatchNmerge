@@ -211,12 +211,30 @@ Lösungsschritte
    ```sh
    pip install pyinstaller 
    ```
-2. pyinstaller ausführen
+2. pyinstaller initial ausführen
    ```sh
    pyinstaller --noconfirm --onefile --console --add-data "<PythonPfad>/Lib/site-packages/osgeo;osgeo/" --add-data "<PythonPfad>/Lib/site-packages/customtkinter;customtkinter/"  "swisstopoBatchNmerge.py" 
    ```
+3. Die Datei (`swisstopoBatchNmerge.spec`) for der Zeile (`pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher`) mit ergänzen
+   ```sh
+   from PyInstaller.building.datastruct import TOC
 
+# ...
+# a = Analysis(...)
 
+x = 'cp310-win_amd64.pyd'
+datas_upd = TOC()
+
+for d in a.datas:
+    if x not in d[0] and x not in d[1]:
+        datas_upd.append(d)
+
+a.datas = datas_upd 
+   ```
+4. pyinstaller zum zweiten mal ausführen
+   ```sh
+   pyinstaller swisstopoBatchNmerge.spec 
+   ```
 <!-- LICENSE -->
 ## License
 

@@ -39,6 +39,7 @@ import shutil
 import sys
 import tkinter
 import tkintermapview
+import time
 # TODO: requests already imported above. Use that instead of loading another url/request library
 import urllib.request
 from osgeo import gdal
@@ -60,29 +61,46 @@ supportedformats = ['.tif', '.png', '.tiff', '.TIFF']
 # in a cache locally
 
 #StandarVars
-GUI_Version="Version 1.1.0"
+GUI_Version="Version 1.2.0"
 homedir = os.getcwd() 
 pbar = None
 nonImageLayers='swissalti'
+
 
 customtkinter.set_appearance_mode("dark")  # Modes: "System" (standard), "Dark", "Light"
 customtkinter.set_default_color_theme("blue")  # Themes: "blue" (standard), "green", "dark-blue"
 
 choices = {
-    'SWISSIMAGE 10cm': 'ch.swisstopo.swissimage-dop10',
+    'Luftbild 10cm': 'ch.swisstopo.swissimage-dop10',
     'Landeskarte 1:10': 'ch.swisstopo.landeskarte-farbe-10',
     'Landeskarte 1:25': 'ch.swisstopo.pixelkarte-farbe-pk25.noscale',
     'Landeskarte 1:50': 'ch.swisstopo.pixelkarte-farbe-pk50.noscale',
     'Landeskarte 1:100': 'ch.swisstopo.pixelkarte-farbe-pk100.noscale',
     'Landeskarte 1:200': 'ch.swisstopo.pixelkarte-farbe-pk200.noscale',
-    'swissALTI3D': 'ch.swisstopo.swissalti3d',
+    'Höhenmodell': 'ch.swisstopo.swissalti3d',
 }
 
 
 choices_data = choices.items()
 choices_list = list(choices_data)
 choices_arr = np.array(choices_list)
+#TOD DO create a product array: <product name> <technical layernmane> <wmts file extension> <files size download>
+#CHOICES_ARR=np.array([
+#        ['Luftbild 10cm', 'ch.swisstopo.swissimage-dop10','jpeg','40'],
+#        ['Landeskarte 1:10', 'ch.swisstopo.landeskarte-farbe-10','png','60']
+#        ])
+#get second tuple from CHOICES_ARR where first element is 'Landeskarte 1:10'
+#print(CHOICES_ARR[np.where(CHOICES_ARR[:,0]=='Landeskarte 1:10')[0][0],1])
 
+
+def humansize(nbytes):
+    suffixes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB']
+    i = 0
+    while nbytes >= 1024 and i < len(suffixes)-1:
+        nbytes /= 1024.
+        i += 1
+    f = ('%.2f' % nbytes).rstrip('0').rstrip('.')
+    return '%s %s' % (f, suffixes[i])
 
 
 def osm_to_decimal(tile_x: Union[int, float], tile_y: Union[int, float], zoom: int) -> tuple:
@@ -108,26 +126,45 @@ def browseFiles():
     processCSV(CSV_filepath,None)
     label_file_explorer.configure(text="FINISHED: "+CSV_filepath+".tif  ")
     
-      
-
-# Function to create a CSV for import	
-def createCSV(productname,LLlon,LLlat,URlon,URlat) :
-    # TODO: Happy path programming. Basic error handling should be added. Try blocks.
-    # Robust code/service is the result of well designed  error handling
-    #preparing filename
-    coords=(LLlon+"_"+LLlat+"_"+URlon+"_"+URlat)
-    CSV_filepath=os.path.join(homedir,(productname+coords+".csv"))
+# Function to retrieve items for an AOI	      
+#gettingitemlist 
+def getitems(productname,LLlon,LLlat,URlon,URlat,first100):
     
-    #gettingitemlist
     itemsrequest = requests.get("https://data.geo.admin.ch/api/stac/v0.9/collections/"+productname+"/items?bbox="+LLlon+","+LLlat+","+URlon+","+URlat) #cal on STAC API
+    #print("https://data.geo.admin.ch/api/stac/v0.9/collections/"+productname+"/items?bbox="+LLlon+","+LLlat+","+URlon+","+URlat)
+    
     itemsresult = json.loads(itemsrequest.content)
+    #find elements in the list itemsresult where the key "properties" has the value "download"
     assets=(nested_lookup.nested_lookup('assets', itemsresult)) #go throug nested results
+    count=0
+  
+    if len(itemsresult['links'])>=6:
+        morethan100=1
+    else:
+        morethan100=0
+    
+    #Take the pagination into account':
+    if len(itemsresult['links'])>=6 and first100==0:        
+        pagination=1
+        while pagination==1:
+            nextpage=itemsresult['links'][5]['href']
+            itemsrequest = requests.get(nextpage)
+            itemsresult = json.loads(itemsrequest.content)
+            assets=np.append(assets,(nested_lookup.nested_lookup('assets', itemsresult)))
+            
+            if len(itemsresult['links'])>=6 and itemsresult['links'][5]['rel']=='next':
+                pagination=1
+                print("Collecting Download URLs: "+str(count*100))
+                count=count+1
+            else:
+                pagination=0
+                assets=assets.tolist()
+    else:
+        pass
+   
+    
     itemsfiles=(nested_lookup.nested_lookup('href', assets))
-
     
-    
-
-
     #edge case _krel_ : swisstopo provides also grey an relief free raster maps ,we go only for krel
     # TODO: make special cases generic (outsource to dedicated function that is genereic for similar special cases)
     # in this case something like 'filter_if_contains(list, term)'. There might be even a ready-made python lib/function
@@ -141,7 +178,18 @@ def createCSV(productname,LLlon,LLlat,URlon,URlat) :
     highres=[i for i in itemsfiles if "_0.1_" in i]
     if len(highres) != 0 :
         itemsfiles=highres
-        
+
+
+    #edge case swissalti : swisstopo provides different spatiale resolution we go for the 0.1 ,we go only for krel
+    # TODO: See, you repeat the same code here for another special case
+    if productname == 'ch.swisstopo.swissalti3d':
+        tiff=[i for i in itemsfiles if ".tif" in i]
+        if len(tiff) != 0 :
+            itemsfiles=tiff
+        highres=[i for i in itemsfiles if "_0.5_" in i]
+        if len(highres) != 0 :
+            itemsfiles=highres
+      
     #edge case creation date get the most recent one
     
     #split the name of the file to get the dates etc
@@ -174,6 +222,18 @@ def createCSV(productname,LLlon,LLlat,URlon,URlat) :
         i=i+1
     #remove duplicates
     itemsfiles= list(dict.fromkeys(latest_itemsfiles))
+    return itemsfiles,morethan100
+
+# Function to create a CSV for import	
+def createCSV(productname,LLlon,LLlat,URlon,URlat) :
+    # TODO: Happy path programming. Basic error handling should be added. Try blocks.
+    # Robust code/service is the result of well designed  error handling
+    #preparing filename
+    coords=(LLlon+"_"+LLlat+"_"+URlon+"_"+URlat)
+    CSV_filepath=os.path.join(homedir,(productname+coords+".csv"))
+    
+    itemsfiles=getitems(productname,LLlon,LLlat,URlon,URlat,0)
+    itemsfiles=itemsfiles[0]
     
     #create temporaryCSV file
     with open(CSV_filepath, 'w') as f:
@@ -217,7 +277,7 @@ def check_local_system(gettempdir,filename,lines) :
     if free_space_gb < requiredspaceGB :
         print("!!!!!!!!!!!!!!!!!!!!!   WARNING  !!!!!!!!!!!!!!!!!!!!")
         print(low_space_message)
-        # what is breakpoint()?
+        
         sys.exit()
         return
     else :
@@ -326,7 +386,7 @@ def processCSV(CSV_filepath,geom):
                 
     #rename data
     if geom is not None and len(geom) == 4 and args.noCROP == 0 and args.noMERGE == 0: #geom has 4 bbox coordinates
-        print("Ausschneiden ...")
+        print("Clipping...")
         
         cropRaster(temp_merged,merged,geom)
         
@@ -347,7 +407,7 @@ def processCSV(CSV_filepath,geom):
         print("Ergebnis in "+result)
         os.chdir(homedir)
     #exit?
-    exit
+    return
 
 
 #main partition
@@ -370,7 +430,7 @@ args = parser.parse_args()
 #args.noGUI=1
 
 if args.PROXY is not None : 
- os.environ['HTTP_PROXY'] = args.PROXY
+ os.environ['HTTPS_PROXY'] = args.PROXY
  
 if args.noGUI == 0 :
     class App(customtkinter.CTk):
@@ -392,6 +452,11 @@ if args.noGUI == 0 :
             self.createcommand('tk::mac::Quit', self.on_closing)
 
             self.marker_list = []
+            
+            # Product extent loading in background threads
+            self.after(100, self.update_canvas_product)
+            self.canvas_product_size="..."
+            
 
 
             # ============ create two CTkFrames ============
@@ -463,6 +528,7 @@ if args.noGUI == 0 :
             self.slider_1.set(self.map_widget.zoom)
             
             #start download
+            
             self.button_2 = customtkinter.CTkButton(master=self.frame_right,
                                                     text="START Download",
                                                     fg_color= "red",
@@ -472,6 +538,13 @@ if args.noGUI == 0 :
                                                     corner_radius=8)
             self.button_2.grid(row=2, column=2, sticky="e", padx=20, pady=20)
 
+            #size of the download
+            self.label_size = customtkinter.CTkLabel(master=self.frame_right,
+                                                    text=self.canvas_product_size)
+            self.label_size.grid(row=2, column=1, pady=20, padx=20, sticky="e")
+
+            #TODO log in widget
+            #------------------------------------------------------
             #self.log_widget = tkinter.scrolledtext.ScrolledText(self.frame_right, height=4,width=120,  font=("consolas", "8", "normal"))
             #self.log_widget.grid(row=2, columnspan=2, sticky="e", padx=20, pady=20)
             #logger = PrintLogger(self.log_widget)
@@ -486,10 +559,54 @@ if args.noGUI == 0 :
         def slider_event(self, value):
             self.map_widget.set_zoom(value)
 
-        
-        def loadmapproduct_event(self, event=None):
+        def update_canvas_product(self):
+            #get upper coordinates
             LR=osm_to_decimal(self.map_widget.lower_right_tile_pos[0],self.map_widget.lower_right_tile_pos[1],self.map_widget.last_zoom)
             UL=osm_to_decimal(self.map_widget.upper_left_tile_pos[0],self.map_widget.upper_left_tile_pos[1],self.map_widget.last_zoom)
+            
+            #dont' calculate if the product is overview
+            if  self.optionmenu_1.current_value == "Auswahl Datensatz" :
+                self.LR_last = LR
+                self.UL_last = UL
+                self.last_product = self.optionmenu_1.current_value    
+            # if the BBox is changed, calculate the new extent
+            elif LR != self.LR_last or UL != self.UL_last or self.optionmenu_1.current_value != self.last_product:
+                #get the number of files neede for download product, call only the first 100 files
+                items=getitems(choices[self.optionmenu_1.current_value],str(UL[1]),str(LR[0]),str(LR[1]),str(UL[0]),1)
+                numberofdownloads=len(items[0])
+                
+                if items[1] == 1:
+                    prefix = "more than "
+                else:
+                    prefix = "                ~ "
+                
+                #size of the download
+                self.label_size = customtkinter.CTkLabel(master=self.frame_right,text=prefix+humansize(numberofdownloads*self.filesize)+ "  to download")
+                self.label_size.grid(row=2, column=1, pady=20, padx=20, sticky="e")
+                self.last_product = self.optionmenu_1.current_value
+                self.LR_last = LR
+                self.UL_last = UL
+                
+            else:
+                pass
+
+            # This function calls itself every 10 ms with tk.after() so that the image updates come
+            # from the main GUI thread, because tkinter can only be updated from the main thread.
+            self.after(10, self.update_canvas_product)
+        
+        def loadmapproduct_event(self, event=None):
+            
+            LR=osm_to_decimal(self.map_widget.lower_right_tile_pos[0],self.map_widget.lower_right_tile_pos[1],self.map_widget.last_zoom)
+            UL=osm_to_decimal(self.map_widget.upper_left_tile_pos[0],self.map_widget.upper_left_tile_pos[1],self.map_widget.last_zoom)
+            #Get the first file and calculate the size of the download 
+            
+            items=getitems(choices[self.optionmenu_1.current_value],str(8.08698),str(46.29962),str(8.18698),str(46.39962),1)
+            file=urllib.request.urlopen(items[0][0])
+            
+            self.filesize=file.length
+            self.last_product = self.optionmenu_1.current_value
+           
+            
             z=self.map_widget.last_zoom
             self.map_widget.tile_image_cache={}
             if choices[self.optionmenu_1.current_value] =="ch.swisstopo.swissalti3d":
@@ -504,29 +621,34 @@ if args.noGUI == 0 :
             else:
                 WMTS_name=choices[self.optionmenu_1.current_value]
                 WMTS_fileextension=".jpeg"
-            #breakpoint()
+            
             self.map_widget = tkintermapview.TkinterMapView(self.frame_right, corner_radius=11)
             self.map_widget.grid(row=1, rowspan=1, column=0, columnspan=3, sticky="nswe", padx=(20, 20), pady=(5, 0))
             self.map_widget.set_tile_server("https://wmts.geo.admin.ch/1.0.0/"+WMTS_name+"/default/current/3857/{z}/{x}/{y}"+WMTS_fileextension)  # no labels        
             # set current map widget position and zoom
             self.map_widget.set_position((LR[0]+UL[0])/2, (LR[1]+UL[1])/2)  # center current poistions
             self.map_widget.set_zoom(z)
+            #self.update_canvas_product(self)
+            
+            
 
         def start_download_event(self):
             print("Starting download...")
             LR=osm_to_decimal(self.map_widget.lower_right_tile_pos[0],self.map_widget.lower_right_tile_pos[1],self.map_widget.last_zoom)
             UL=osm_to_decimal(self.map_widget.upper_left_tile_pos[0],self.map_widget.upper_left_tile_pos[1],self.map_widget.last_zoom)
+
             
             if self.optionmenu_1.current_value == 'Auswahl Datensatz':
                 print("******************")
                 print("Produkt auswählen!")
             else:
                 product= choices[self.optionmenu_1.current_value]
-            
+
                 CSV_filepath=createCSV(product,str(UL[1]),str(LR[0]),str(LR[1]),str(UL[0]))
                 bbox= (UL[1],LR[0],LR[1],UL[0])
                 processCSV(CSV_filepath,bbox)
-                
+                self.label_size = customtkinter.CTkLabel(master=self.frame_right,text_color="red",text="        ...download complete.")
+                self.label_size.grid(row=2, column=1, pady=20, padx=20, sticky="e")
         
 
         def on_closing(self, event=0):
