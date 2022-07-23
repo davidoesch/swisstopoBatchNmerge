@@ -43,7 +43,7 @@
  
 | **Link** 	| **Typ** 	| **Betriebssystem** 	|
 |:---:	|:---:	|:---:	|
-| <a href="https://github.com/davidoesch/swisstopoBatchNmerge/blob/master/dist/swisstopoBatchNmerge.exe">Download</a> 	| .exe 	| [![Windows](https://svgshare.com/i/ZhY.svg)](https://github.com/davidoesch/swisstopoBatchNmerge/tree/master/dist) 	|
+| <a href="https://github.com/davidoesch/swisstopoBatchNmerge/blob/master/dist/swisstopoBatchNmerge.exe?raw=true">Download</a> 	| .exe 	| [![Windows](https://svgshare.com/i/ZhY.svg)](https://github.com/davidoesch/swisstopoBatchNmerge/blob/master/dist/swisstopoBatchNmerge.exe?raw=true) 	|
 | <a href="#keine-installation">Installation</a> 	| ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54) 	| [![Windows](https://svgshare.com/i/ZhY.svg)](https://github.com/davidoesch/swisstopoBatchNmerge/#keine-installation) [![macOS](https://svgshare.com/i/ZjP.svg)](https://github.com/davidoesch/swisstopoBatchNmerge/#keine-installation) [![Linux](https://svgshare.com/i/Zhy.svg)](https://github.com/davidoesch/swisstopoBatchNmerge/#keine-installation) 	|
 </div>
 
