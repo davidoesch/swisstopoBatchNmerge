@@ -26,6 +26,7 @@
 
 
 
+
 <!-- PROJECT LOGO -->
 <br />
 <p align="center">
@@ -34,18 +35,26 @@
   <h3 align="center">swisstopoBatchNmerge</h3>
 
   <p align="center">
-    Download und zusammenführen von swisstopo opendata
-    <br />
-    <a href="https://github.com/davidoesch/swisstopoBatchNmerge/tree/master/dist"><strong>Download Windows Version »</strong></a>
-    <br />
-    <br />
-    <a href="https://github.com/davidoesch/swisstopoBatchNmerge/tree/master/dist"></a>
+    PC / Mac / Linux Anwendung für den Download von swisstopo Landeskarten Luftbilder Höhenmodellen
+  </p>
+  </p>
+ 
+<div align="center">
+ 
+| **Link** 	| **Typ** 	| **Betriebssystem** 	|
+|:---:	|:---:	|:---:	|
+| <a href="https://github.com/davidoesch/swisstopoBatchNmerge/blob/master/dist/swisstopoBatchNmerge.exe">Download</a> 	| .exe 	| [![Windows](https://svgshare.com/i/ZhY.svg)](https://github.com/davidoesch/swisstopoBatchNmerge/tree/master/dist) 	|
+| <a href="#keine-installation">Installation</a> 	| ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54) 	| [![Windows](https://svgshare.com/i/ZhY.svg)](https://github.com/davidoesch/swisstopoBatchNmerge/#keine-installation) [![macOS](https://svgshare.com/i/ZjP.svg)](https://github.com/davidoesch/swisstopoBatchNmerge/#keine-installation) [![Linux](https://svgshare.com/i/Zhy.svg)](https://github.com/davidoesch/swisstopoBatchNmerge/#keine-installation) 	|
+</div>
+
+   <p align="center">
     ·
     <a href="https://github.com/davidoesch/swisstopoBatchNmerge/issues">Report Bug</a>
     ·
     <a href="https://github.com/davidoesch/swisstopoBatchNmerge/issues">Request Feature</a>
   </p>
 </p>
+
 
 
 
@@ -59,8 +68,8 @@
     <li>
       <a href="#getting-started">Getting started</a>
       <ul>
-        <li><a href="#prerequisites">Vorraussetzung</a></li>
-        <li><a href="#installation">(keine) Installation</a></li>
+        <li><a href="#voraussetzungen">Voraussetzung</a></li>
+        <li><a href="#keine-installation">(Keine) Installation</a></li>
       </ul>
     </li>
     <li><a href="#beispiele">Beispiele</a></li>
@@ -77,7 +86,7 @@
 <!-- ABOUT THE PROJECT -->
 ## Das Projekt
 
-[![Product Name Screen Shot][product-screenshot]]
+![Product Name Screen Shot][product-screenshot]
 
 Ein einfaches graphisches Werkzeug um die aktuellsten swisstopo Karten und Höhenmodell und Luftbilder für ein Gebiet (die Grösse des Fenster durch ziehen anpassen) als ein File richtig zugeschnitten zu beziehen - ist umgesetzt.
 
@@ -140,7 +149,7 @@ MAC / LINUX / Windows
 
 <!-- USAGE EXAMPLES -->
 ## Beispiele
- unten sind WINDOWS /DOS Beispiele. Bei MAC LINUX jeweils "python sswisstopoBatchNmerge.py" einsetzen
+Für WINDOWS / DOS. Für MAC LINUX jeweils `python swisstopoBatchNmerge.py` anstatt `swisstopoBatchNmerge.exe` einsetzen
 
 ### GUI starten
    ```PY
