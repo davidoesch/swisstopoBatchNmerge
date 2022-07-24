@@ -45,6 +45,8 @@ import urllib.request
 from osgeo import gdal
 from pyproj import Transformer
 from typing import Union
+import webbrowser
+from requests.exceptions import Timeout
 
 
 #os.environ['PROJ_LIB'] = 'C:\Program Files\Python39\Lib\site-packages\osgeo\data\proj'
@@ -61,11 +63,27 @@ supportedformats = ['.tif', '.png', '.tiff', '.TIFF']
 # in a cache locally
 
 #StandarVars
-GUI_Version="Version 1.2.0"
+GUI_Version="v1.3.0"
 homedir = os.getcwd() 
 pbar = None
 nonImageLayers='swissalti'
 
+
+#check if GUI Version is the same as the one github
+try:
+    response = requests.get("https://api.github.com/repos/davidoesch/swisstopoBatchNmerge/releases/latest")
+except Timeout:
+    print("Your internet connection is not working. Please check your connection and try again.")
+    sys.exit(1)
+github_version = response.json()['tag_name']
+if (response.json()["name"]) != GUI_Version:
+    print("You are using: "+GUI_Version+" New version available:"+github_version+" Download it from https://github.com/davidoesch/swisstopoBatchNmerge")
+    GET_NEWVERSION=("New version available:")
+else:
+    GET_NEWVERSION=""
+
+def callback():
+    webbrowser.open_new("https://github.com/davidoesch/swisstopoBatchNmerge")
 
 customtkinter.set_appearance_mode("dark")  # Modes: "System" (standard), "Dark", "Light"
 customtkinter.set_default_color_theme("blue")  # Themes: "blue" (standard), "green", "dark-blue"
@@ -481,6 +499,22 @@ if args.noGUI == 0 :
             self.optionmenu_1.grid(pady=(20, 0), padx=(20, 20), row=2, column=0)
             self.optionmenu_1.set("Auswahl Datensatz")
             
+            if GET_NEWVERSION != "":
+                #New Version
+                self.label_newversion = customtkinter.CTkLabel(master=self.frame_left,
+                                                    text=GET_NEWVERSION)
+                self.label_newversion.grid(pady=(20, 0), padx=(20, 20), row=3, column=0,sticky="w")
+                #add download button
+                self.button_newversion= customtkinter.CTkButton(master=self.frame_left,
+                                                    text="Download "+github_version,
+                                                    fg_color= "red",
+                                                    command=callback,
+                                                    width=160, height=30,
+                                                    border_width=0,
+                                                    corner_radius=8)
+                self.button_newversion.grid(pady=(0, 0), padx=(20, 20),row=4, column=0,sticky="nsew")
+            else:
+                pass
 
             # ============ frame_right ============
 
@@ -542,6 +576,8 @@ if args.noGUI == 0 :
             self.label_size = customtkinter.CTkLabel(master=self.frame_right,
                                                     text=self.canvas_product_size)
             self.label_size.grid(row=2, column=1, pady=20, padx=20, sticky="e")
+            
+
 
             #TODO log in widget
             #------------------------------------------------------
@@ -640,7 +676,7 @@ if args.noGUI == 0 :
             
             if self.optionmenu_1.current_value == 'Auswahl Datensatz':
                 print("******************")
-                print("Produkt auswählen!")
+                print("Datensatz auswählen!")
             else:
                 product= choices[self.optionmenu_1.current_value]
 
