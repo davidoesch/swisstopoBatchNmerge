@@ -448,7 +448,7 @@ args = parser.parse_args()
 #args.noGUI=1
 
 if args.PROXY is not None : 
- os.environ['HTTPS_PROXY'] = args.PROXY
+ os.environ['HTTP_PROXY'] = args.PROXY
  
 if args.noGUI == 0 :
     class App(customtkinter.CTk):
