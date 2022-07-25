@@ -69,18 +69,7 @@ pbar = None
 nonImageLayers='swissalti'
 
 
-#check if GUI Version is the same as the one github
-try:
-    response = requests.get("https://api.github.com/repos/davidoesch/swisstopoBatchNmerge/releases/latest")
-except Timeout:
-    print("Your internet connection is not working. Please check your connection and try again.")
-    sys.exit(1)
-github_version = response.json()['tag_name']
-if (response.json()["name"]) != GUI_Version:
-    print("You are using: "+GUI_Version+" New version available:"+github_version+" Download it from https://github.com/davidoesch/swisstopoBatchNmerge")
-    GET_NEWVERSION=("New version available:")
-else:
-    GET_NEWVERSION=""
+
 
 def callback():
     webbrowser.open_new("https://github.com/davidoesch/swisstopoBatchNmerge")
@@ -449,7 +438,20 @@ args = parser.parse_args()
 
 if args.PROXY is not None : 
  os.environ['HTTP_PROXY'] = args.PROXY
- 
+
+#check if GUI Version is the same as the one github
+try:
+    response = requests.get("https://api.github.com/repos/davidoesch/swisstopoBatchNmerge/releases/latest")
+except Timeout:
+    print("Your internet connection is not working. Please check your connection and try again.")
+    sys.exit(1)
+github_version = response.json()['tag_name']
+if (response.json()["name"]) != GUI_Version:
+    print("You are using: "+GUI_Version+" New version available:"+github_version+" Download it from https://github.com/davidoesch/swisstopoBatchNmerge")
+    GET_NEWVERSION=("New version available:")
+else:
+    GET_NEWVERSION=""
+
 if args.noGUI == 0 :
     class App(customtkinter.CTk):
 
