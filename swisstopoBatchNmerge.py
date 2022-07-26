@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 ###############################################################################
-# $Id: swisstopobatch.py 2021
+# $Id: swisstopoBatchNmergeh.py 2021
 #
+#Warning: This script is not yet finished.Code is more than nasty, it can hurt your eyes. 
 # 
 # Purpose:  Download swisstopo data see https://github.com/davidoesch/swisstopo-batchNmerge 
 # Author:   David Oesch
@@ -430,6 +431,7 @@ parser.add_argument("--noCROP", type=int, default=0)
 parser.add_argument("--noGUI", type=int, default=0)
 parser.add_argument("--noMERGE", type=int, default=0)
 parser.add_argument("--PROXY")
+parser.add_argument("--PROXYS")
 args = parser.parse_args()
 
 #remove only test below
@@ -438,6 +440,9 @@ args = parser.parse_args()
 
 if args.PROXY is not None : 
  os.environ['HTTP_PROXY'] = args.PROXY
+
+if args.PROXYS is not None : 
+ os.environ['HTTPS_PROXY'] = args.PROXYS
 
 #check if GUI Version is the same as the one github
 try:

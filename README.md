@@ -23,8 +23,8 @@
 [![Issues][issues-shield]][issues-url]
 [![MIT License][license-shield]][license-url]
 [![LinkedIn][linkedin-shield]][linkedin-url]
-![GitHub all releases](https://img.shields.io/github/downloads/davidoesch/swisstopoBatchNmerge/total?style=for-the-badge)
-
+<!-- ![GitHub all releases](https://img.shields.io/github/downloads/davidoesch/swisstopoBatchNmerge/total?style=for-the-badge)
+-->
 
 
 
