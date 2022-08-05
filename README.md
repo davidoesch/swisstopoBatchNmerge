@@ -162,6 +162,11 @@ Falls du über einen PROXY (meist in Firmennetzwerken der Fall) Zugang hast, mus
    ```PY
    swisstopoBatchNmerge.exe --PROXY http://proxy_url:proxy_port
    ```
+   resepktive für SSL PROXY
+   ```PY
+   swisstopoBatchNmerge.exe --PROXYS https://proxy_url:proxy_port
+   ```
+   
 ### CSV 
 Ein Liste mit einer Download URL des geo.admin.ch STAC item pro Zeile wird  abgearbeitet: heruntergeladen und zusammengeführt. 
 Optionen --noMERGE 1 --PROXY http://proxy_url:proxy_port
