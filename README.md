@@ -162,7 +162,7 @@ Falls du über einen PROXY (meist in Firmennetzwerken der Fall) Zugang hast, mus
    ```PY
    swisstopoBatchNmerge.exe --PROXY http://proxy_url:proxy_port
    ```
-   resepktive für SSL PROXY
+   respektive für SSL PROXY
    ```PY
    swisstopoBatchNmerge.exe --PROXYS https://proxy_url:proxy_port
    ```
