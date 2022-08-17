@@ -105,6 +105,10 @@ Eine Liste häufig verwendeter Ressourcen, die ich hilfreich finde, ist in den a
 #### Limitierung (current version)
 - Zusammenführen und ausschneiden nur für Landeskarte , Luftbild/Swissimage und Höhenmodell/Swissalti möglich
 
+> **Warning**
+> - Es können sehr grosse Datenmengen bezogen werden. Bitte prüfen Sie vorab, dass auf ihrem System die berechnete Disk Space zur Verfügung steht und das ihr System mit dieser Datenmenge umgehen kann . 
+
+
 <!-- GETTING STARTED -->
 ## Getting Started
 
